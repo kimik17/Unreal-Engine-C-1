@@ -19,8 +19,13 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	int32 numbermove = 0;
+	int32 numberevent = 0;
+	double TotalDistance = 0.0;
+
 public:	
 
+	void TriggerEvent();
 	void Move();
 	void Turn();
 };

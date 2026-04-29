@@ -16,12 +16,30 @@ void AMyActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SetActorLocation(0, 0, 50);
-	for (int32 i = 0; i < 10; ++i)
+	SetActorLocation(FVector(0, 0, 50));
+	for (int32 i = 0; i < 10; ++i) {
 		Move();
-	for (int32 i = 0; i < 10; ++i)
+		TriggerEvent();
+	}	
+	for (int32 i = 0; i < 10; ++i) {
 		Turn();
-	
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, TEXT(""));
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, FString::Printf(TEXT("Total distance traveled : %f"), TotalDistance));
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, FString::Printf(TEXT("Total number of events : %d"), numberevent));
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, TEXT("Data Report"));
+}
+
+void AMyActor::TriggerEvent()
+{
+	bool TriggerEvent = (FMath::RandRange(0, 1) == 1);
+
+	if (TriggerEvent)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, TEXT("EVENT TRIGGERED!"));
+
+		++numberevent;
+	}
 }
 
 void AMyActor::Move()
@@ -31,12 +49,21 @@ void AMyActor::Move()
 	Target.Y = FMath::FRandRange(-50.0, 50.0);
 	Target.Z = 0;
 
+	FVector OldLoc = GetActorLocation();
+
 	AddActorWorldOffset(Target);
 
 	FVector CurrentLocation = GetActorLocation();
+
+	FVector NewLoc = GetActorLocation();
+
+	TotalDistance += FVector::Dist(OldLoc, NewLoc);
+
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, *CurrentLocation.ToString());
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::Printf(TEXT("Move #%d"), (++numbermove)));
+		
 	}
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *CurrentLocation.ToString());
 }
@@ -50,10 +77,10 @@ void AMyActor::Turn()
 
 	AddActorWorldRotation(DeltaRotation);
 
-	FVector CurrentLocation = GetActorLocation();
+	FRotator CurrentRotation = GetActorRotation();
 	if (GEngine)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, *CurrentLocation.ToString());
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Blue, *CurrentRotation.ToString());
 	}
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *CurrentLocation.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *CurrentRotation.ToString());
 }
